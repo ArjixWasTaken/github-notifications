@@ -39,11 +39,13 @@
     "windows": [
       {
         "fullscreen": false,
-        "resizable": true,
+        "resizable": false,
         "label": "main",
         "title": "Github Notifications",
         "width": 450,
-        "height": 715
+        "height": 715,
+        "visible": false,
+        "transparent": true
       }
     ],
     "systemTray": {

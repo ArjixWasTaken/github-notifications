@@ -1,14 +1,13 @@
 import { useEffect, useState } from "react";
 import reactLogo from "./assets/react.svg";
 import "./App.css";
-import { invoke } from '@tauri-apps/api/tauri'
 
 
 
 function App() {
   const [greetMsg, setGreetMsg] = useState("");
   const [name, setName] = useState("");
-  
+
   return (
     <div className="container">
       <h1>Welcome to Tauri!</h1>

@@ -1,12 +1,7 @@
-use tauri::{
-    AppHandle, CustomMenuItem, Manager, SystemTray, SystemTrayEvent, SystemTrayMenu,
-    SystemTrayMenuItem,
-};
+use tauri::{AppHandle, CustomMenuItem, Manager, SystemTray, SystemTrayEvent, SystemTrayMenu};
 
 fn get_menu() -> SystemTrayMenu {
-    let quit = CustomMenuItem::new("quit".to_string(), "Quit");
-
-    SystemTrayMenu::new().add_item(quit)
+    SystemTrayMenu::new().add_item(CustomMenuItem::new("quit".to_string(), "Quit"))
 }
 
 pub fn get_tray() -> SystemTray {
@@ -23,11 +18,15 @@ pub fn tray_callback(app: &AppHandle, event: SystemTrayEvent) {
             ..
         } => {
             let window = app.get_window("main").unwrap();
-            if window.is_visible().unwrap() {
+            if window.is_visible().unwrap() && !window.is_minimized().unwrap() {
+                window.minimize().unwrap();
+
                 window.hide().unwrap();
+                window.emit("hide", 0).unwrap();
             } else {
-                window.show().unwrap();
-                window.unminimize().unwrap();
+                crate::utils::move_window(&window);
+                window.emit("make_visible", 0).unwrap();
+                window.emit("show", 0).unwrap();
             }
         }
         SystemTrayEvent::MenuItemClick { id, .. } => match id.as_str() {

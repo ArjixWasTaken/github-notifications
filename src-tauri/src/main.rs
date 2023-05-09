@@ -1,30 +1,21 @@
 // Prevents additional console window on Windows in release, DO NOT REMOVE!!
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
-use ::device_query::{DeviceQuery, DeviceState, MouseState};
-use tauri::{Manager, PhysicalPosition, Position};
+use tauri::Manager;
 
 mod tray;
+mod utils;
 
 #[tauri::command]
 async fn move_window(window: tauri::Window) {
-    let state: DeviceState = DeviceState::new();
+    utils::move_window(&window);
+}
 
-    let mouse = state.get_mouse();
-    let (mouse_x, mouse_y) = mouse.coords;
-
-    let monitor = window.current_monitor().unwrap().unwrap();
-    let size = monitor.size();
-    let win_size = window.outer_size().unwrap();
-
-    window
-        .set_position(Position::Physical(PhysicalPosition {
-            x: (mouse_x) - (win_size.width / 2) as i32,
-            y: mouse_y,
-        }))
-        .unwrap();
-
+#[tauri::command]
+async fn make_visible(window: tauri::Window) {
     window.show().unwrap();
+    window.unminimize().unwrap();
+    window.set_focus().unwrap();
 }
 
 fn main() {
@@ -36,15 +27,34 @@ fn main() {
 
             match event.event() {
                 CloseRequested { api, .. } => {
-                    let win_handle = event.window().hwnd().unwrap();
-
                     event.window().hide().unwrap();
                     api.prevent_close();
+                }
+                Resized(size) => {
+                    if size.width == 0 && size.height == 0 {
+                        // minimized
+                        event.window().emit("hide", 0).unwrap();
+                    } else {
+                        // unminimized
+                        event.window().emit("show", 0).unwrap();
+                        utils::move_window(&event.window());
+                    }
                 }
                 _ => {}
             }
         })
-        .invoke_handler(tauri::generate_handler![move_window])
+        .invoke_handler(tauri::generate_handler![move_window, make_visible])
+        .setup(|app| {
+            use tauri_plugin_positioner::{Position, WindowExt};
+
+            let window = app.get_window("main").unwrap();
+            window.move_window(Position::TopRight).unwrap();
+            window.set_always_on_top(true).unwrap();
+
+            window.emit("make_visible", 0).unwrap();
+
+            Ok(())
+        })
         .build(tauri::generate_context!())
         .expect("error while building the context")
         .run(|_app_handle, event| match event {

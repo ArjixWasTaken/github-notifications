@@ -48,10 +48,23 @@ fn main() {
             use tauri_plugin_positioner::{Position, WindowExt};
 
             let window = app.get_window("main").unwrap();
-            window.move_window(Position::TopRight).unwrap();
-            window.set_always_on_top(true).unwrap();
+            window.move_window(Position::BottomRight).unwrap();
 
-            window.emit("make_visible", 0).unwrap();
+            let monitor = window.current_monitor().unwrap().unwrap();
+
+            let size = monitor.size();
+            let win_size = window.outer_size().unwrap();
+
+            let desktop_height = size.height as f64 * 0.958;
+
+            let mut pos = window.outer_position().unwrap();
+            pos.y = desktop_height as i32 - win_size.height as i32;
+
+            window.set_position(pos).unwrap();
+
+            window.show().unwrap();
+            window.unminimize().unwrap();
+            window.set_focus().unwrap();
 
             Ok(())
         })

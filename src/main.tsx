@@ -11,17 +11,13 @@ listen("hide", () => {
 
 listen("make_visible", () => invoke("make_visible"));
 
+window.addEventListener("keydown", ({ key, ctrlKey }) => {
+  if (ctrlKey && ["r", "R"].includes(key)) {
+    window.location.reload()
+  }
+}, true);
+
 setTimeout(() => {
   invoke("make-visible")
+  window.location.href = "https://github.com/notifications"
 }, 500);
-
-import React from "react";
-import ReactDOM from "react-dom/client";
-import App from "./App";
-import "./styles.css";
-
-ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>
-);

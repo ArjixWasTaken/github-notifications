@@ -7,7 +7,7 @@
     "withGlobalTauri": false
   },
   "package": {
-    "productName": "Github Notifications",
+    "productName": "Github Tray",
     "version": "0.0.1"
   },
   "tauri": {
@@ -27,7 +27,7 @@
         "icons/icon.icns",
         "icons/icon.ico"
       ],
-      "identifier": "org.arjixwastaken.github.notifications",
+      "identifier": "org.arjixwastaken.github.tray",
       "targets": "all"
     },
     "security": {
@@ -41,11 +41,12 @@
         "fullscreen": false,
         "resizable": false,
         "label": "main",
-        "title": "Github Notifications",
+        "title": "Github Tray",
         "width": 450,
         "height": 715,
         "visible": false,
-        "transparent": true
+        "transparent": true,
+        "decorations": false
       }
     ],
     "systemTray": {
